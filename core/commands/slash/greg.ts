@@ -41,7 +41,25 @@ const GregSlashCommand: SlashCommand = {
   run: async function* ({ ide, llm, history, params }) {
     const now = new Date();
 
-    let content = "### Session transcript\n\n";
+    // Generate title for the chat session.
+    const titleInput = history.slice(1).reduce((acc, msg) => {
+      if (msg && typeof msg === 'object' && 'role' in msg && 'content' in msg) {
+        const content = Array.isArray(msg.content) 
+          ? msg.content.map(item => typeof item === 'object' ? JSON.stringify(item) : item).join(' ')
+          : msg.content;
+        return acc + `${msg.role}: ${content}\n`;
+      }
+      return acc;
+    }, '');
+
+    const chatTitle = await llm.complete(`Given the following chat session, please generate a concise and informative title (3-8 words). Reply only with the title itself:\n${titleInput.trim()}`);
+    
+    // Generate description for the chat session
+    const descriptionInput = titleInput; // We can use the same input as for the title
+    const chatDescription = await llm.complete(`Given the following chat session, please generate a brief summary or description (2-3 sentences). Reply only with the description itself and avoid things like "This conversation discusses":\n${descriptionInput.trim()}`);
+
+    let content = `# ${chatTitle}\n\n`;
+    content += "### Session transcript\n\n";
     content +=
       `<small>Exported: ${now.toLocaleString('en-US', {
         year: 'numeric',
@@ -56,7 +74,8 @@ const GregSlashCommand: SlashCommand = {
 
     const modelName = llm?.model || "Unknown Model";
     content += `#### Model: \`${modelName}\`\n\n`;
-
+    content += `#### Description\n\n${chatDescription}\n\n`;
+        
     // As currently implemented, the /greg command is by definition the last
     // message in the chat history, this will omit it
     for (let i = 0; i < history.length - 1; i++) {
