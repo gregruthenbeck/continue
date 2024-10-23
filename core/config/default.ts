@@ -76,6 +76,10 @@ export const defaultSlashCommandsVscode: SlashCommandDescription[] = [
     description: "Write comments for the selected code",
   },
   {
+    name: "greg",
+    description: "Custom export the current chat session to markdown",
+  },
+  {
     name: "share",
     description: "Export the current chat session to markdown",
   },
