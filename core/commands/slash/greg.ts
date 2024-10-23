@@ -38,14 +38,29 @@ function reformatCodeBlocks(msgText: string): string {
 const GregSlashCommand: SlashCommand = {
   name: "greg",
   description: "Export the current chat session to markdown",
-  run: async function* ({ ide, history, params }) {
+  run: async function* ({ ide, llm, history, params }) {
     const now = new Date();
 
-    let content = `### [Continue](https://continue.dev) session transcript\n Exported: ${now.toLocaleString()}`;
+    let content = "### Session transcript\n\n";
+    content +=
+      `<small>Exported: ${now.toLocaleString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false,
+        timeZoneName: 'short'
+      })}</small>\n\n`;
+
+    const modelName = llm?.model || "Unknown Model";
+    content += `#### Model: \`${modelName}\`\n\n`;
 
     // As currently implemented, the /greg command is by definition the last
     // message in the chat history, this will omit it
-    for (const msg of history.slice(0, history.length - 1)) {
+    for (let i = 0; i < history.length - 1; i++) {
+      const msg = history[i];
       let msgText = msg.content;
       msgText = stripImages(msg.content);
 
@@ -56,9 +71,15 @@ const GregSlashCommand: SlashCommand = {
       // format messages as blockquotes
       msgText = msgText.replace(/^/gm, "> ");
 
-      content += `\n\n#### ${
-        msg.role === "user" ? "_User_" : "_Assistant_"
-      }\n\n${msgText}`;
+      if (i === 0) {
+        content += `<details><summary>Priming Prompt</summary>\n\n#### ${
+          msg.role === "user" ? "_User_" : "_Assistant_"
+        }\n\n${msgText}\n\n</details>`;
+      } else {
+        content += `\n\n#### ${
+          msg.role === "user" ? "_User_" : "_Assistant_"
+        }\n\n${msgText}`;
+      }
     }
 
     let outputDir: string = params?.outputDir;
