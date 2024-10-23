@@ -11,6 +11,7 @@ import {
   FolderIcon,
   FolderOpenIcon,
   GlobeAltIcon,
+  HandThumbUpIcon,
   HashtagIcon,
   MagnifyingGlassIcon,
   PencilIcon,
@@ -66,6 +67,7 @@ const ICONS_FOR_DROPDOWN: { [key: string]: any } = {
   "/clear": TrashIcon,
   "/comment": HashtagIcon,
   "/share": ArrowUpOnSquareIcon,
+  "/greg": HandThumbUpIcon,
   "/cmd": CommandLineIcon,
 };
 

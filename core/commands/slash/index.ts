@@ -3,6 +3,7 @@ import CommentSlashCommand from "./comment";
 import CommitMessageCommand from "./commit";
 import DraftIssueCommand from "./draftIssue";
 import EditSlashCommand from "./edit";
+import GregSlashCommand from "./greg";
 import HttpSlashCommand from "./http";
 import ReviewMessageCommand from "./review";
 import ShareSlashCommand from "./share";
@@ -12,6 +13,7 @@ export default [
   DraftIssueCommand,
   ShareSlashCommand,
   GenerateTerminalCommand,
+  GregSlashCommand,
   EditSlashCommand,
   CommentSlashCommand,
   HttpSlashCommand,
